@@ -365,7 +365,11 @@ def main():
         print("Path is generated")
     else:
         print("Path not found or invalid start/goal location")
-        
+
+"""
+-> sample input 1 : start(10,40); goal = (560,40)
+-> sample input 2 : start(5,5); goal = (200,200)
+"""
 
 if __name__ == "__main__":
     main()
