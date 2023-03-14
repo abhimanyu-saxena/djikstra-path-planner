@@ -301,6 +301,8 @@ def djikstra(start, goal):
                 space[space.shape[0]-i[1]-1,i[0]] = [0,0,0]
                 space_viz[space.shape[0]-i[1]-1,i[0]] = [0,0,0]
                 saveViz.write(space)
+            cv2.circle(space_viz, (start[0],space.shape[0]-start[1]-1), 1, (0, 0, 255), 2)
+            cv2.circle(space_viz, (goal[0],space.shape[0]-goal[1]-1), 1, (255, 0, 0), 2)
             cv2.imwrite("Path_Taken.jpg", space_viz)
             saveViz.release()
             end_time = time.time()
@@ -345,6 +347,15 @@ def main():
     goal_x = int(input("Enter x co-ordnate of goal position: "))
     goal_y = int(input("Enter y co-ordnate of goal position: "))    
     
+    start = (start_x, start_y)
+    goal = (goal_x, goal_y)
+    
+    success, backPath = djikstra(start, goal)
+    if success:
+        print("Path is generated")
+    else:
+        print("Path not found or invalid start/goal location")
+        
 
 if __name__ == "__main__":
     main()
