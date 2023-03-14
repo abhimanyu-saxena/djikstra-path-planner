@@ -125,13 +125,13 @@ def inObstacleSpace(location):
         return True
     
     # bloated hexagon equations
-    elif ((x >= (230)) and (x <= (369)) and 
-        (y <= (-40/69)*x + 8764/69) and (y <= (4/7)*x - 732/7) and 
-        (y >= (40/69)*x - 13812/69) and (y >= (-4/7)*x + 8492/7)):
+    elif ((x >= (235 - bl)) and (x <= (365 + bl)) and 
+          ((x + 2*y) >= 395) and ((x - 2*y) <= 205) and 
+          ((x - 2*y) >= -105) and ((x + 2*y) <= 705)):
         return True
     
     # bloated triangle equations
-    elif ((y <= (-114/59)*x + 9955/59) and (y >= (114/59)*x + 6515/59) and (x>=457)):
+    elif ((y >= 1.75*x - 776.25 and y <= -1.75*x + 1026.25 and x >= 455)):
         return True
     
     # if robot is not in any above area
@@ -256,12 +256,12 @@ def djikstra(start, goal):
     pathTaken = []
     
     # check if start position is in obstacle space
-    if inObstacleSpace(start.loc):
+    if inObstacleSpace(start):
         print("Start position is in Obstacle space")
         return False, pathTaken
     
     # check if goal position is in obstacle space
-    if inObstacleSpace(goal.loc):
+    if inObstacleSpace(goal):
         print("Start position is in Obstacle space")
         return False, pathTaken
     
@@ -295,18 +295,25 @@ def djikstra(start, goal):
         # check if current node is goal or not
         if current.loc == goal:
             
+            # draw start and goal on vizualization video
+            cv2.circle(space, (start[0],space.shape[0]-start[1]-1), 1, (0, 0, 255), 2)
+            cv2.circle(space, (goal[0],space.shape[0]-goal[1]-1), 1, (255, 0, 0), 2)
+            saveViz.write(space)
+            
             # backtrack to start if current node is goal
             pathTaken = backtrack(current)
             for i in pathTaken:
                 space[space.shape[0]-i[1]-1,i[0]] = [0,0,0]
                 space_viz[space.shape[0]-i[1]-1,i[0]] = [0,0,0]
                 saveViz.write(space)
+            
+            # draw start and goal on path video
             cv2.circle(space_viz, (start[0],space.shape[0]-start[1]-1), 1, (0, 0, 255), 2)
             cv2.circle(space_viz, (goal[0],space.shape[0]-goal[1]-1), 1, (255, 0, 0), 2)
             cv2.imwrite("Path_Taken.jpg", space_viz)
             saveViz.release()
             end_time = time.time()
-            print("Time taken = ", (end_time-start_time)/1000, " sec")
+            print("Time taken = ", (end_time-start_time)/60, " min")
             return True, pathTaken
         else:
             
@@ -337,19 +344,22 @@ def djikstra(start, goal):
                     space[space.shape[0]-y-1,x] = [144, 238, 144]
                     saveViz.write(space)
         
-        return False, pathTaken
 
 def main():
     print("----Djikstra's Path Planner----")
-    start_x = int(input("Enter x co-ordnate of start position: "))
-    start_y = int(input("Enter y co-ordnate of start position: "))
+    
+    # take user input for start
+    start_x = int(input("Enter x co-ordinate of start position: "))
+    start_y = int(input("Enter y co-ordinate of start position: "))
 
-    goal_x = int(input("Enter x co-ordnate of goal position: "))
-    goal_y = int(input("Enter y co-ordnate of goal position: "))    
+    # take user input for goal
+    goal_x = int(input("Enter x co-ordinate of goal position: "))
+    goal_y = int(input("Enter y co-ordinate of goal position: "))    
     
     start = (start_x, start_y)
     goal = (goal_x, goal_y)
     
+    # call djikstra function to find optimal path
     success, backPath = djikstra(start, goal)
     if success:
         print("Path is generated")
